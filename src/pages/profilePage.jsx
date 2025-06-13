@@ -32,8 +32,8 @@ function ProfilePage() {
                     </button>
                 </div>
 
-                <button>Change Password</button>
-                <button>History</button>
+                {/* <button>Change Password</button>
+                <button>History</button> */}
             </div>
         </div>
     );

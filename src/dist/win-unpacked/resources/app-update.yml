@@ -1,0 +1,4 @@
+owner: wantana-ling
+repo: SmartAudit
+provider: github
+updaterCacheDirName: react-app-updater

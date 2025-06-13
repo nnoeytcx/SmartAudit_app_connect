@@ -1,0 +1,8 @@
+version: 0.1.0
+files:
+  - url: SmartAudit-RDP-Setup-0.1.0.exe
+    sha512: paglll7GA6ongVWDS085ZdodsReqOq0V7ubN77tSycadB1W1V7n+HGsuRmmuLd1qCHNv0WTcid6vDAW8yTYWwg==
+    size: 103765169
+path: SmartAudit-RDP-Setup-0.1.0.exe
+sha512: paglll7GA6ongVWDS085ZdodsReqOq0V7ubN77tSycadB1W1V7n+HGsuRmmuLd1qCHNv0WTcid6vDAW8yTYWwg==
+releaseDate: '2025-05-05T18:21:12.355Z'
