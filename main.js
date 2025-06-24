@@ -10,7 +10,7 @@ const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
 function createWindow() {
   const win = new BrowserWindow({
     width: 400,
-    height: 563,
+    height: 565,
     title: 'Smart Audit',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -33,46 +33,6 @@ ipcMain.handle('ping-server', async (event, ip) => {
     return { success: false, message: err.message };
   }
 });
-
-// // === เชื่อมต่อ API สำหรับ login ===
-// ipcMain.handle('login-request', async (event, { user_id, password }) => {
-//   try {
-//     console.log('🔍 Login Request:', user_id, password); // Debug log
-
-//     const response = await axios.post(
-//       'http://192.168.121.195:3000/login',
-//       {
-//         user_id: parseInt(user_id),
-//         password: password
-//       },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json'
-//         }
-//       }
-//     );
-
-//     if (response.data.success) {
-//       return {
-//         success: true,
-//         message: 'Login successful',
-//         user_info: response.data.user_info
-//       };
-//     } else {
-//       return {
-//         success: false,
-//         message: response.data.message
-//       };
-//     }
-//   } catch (err) {
-//     console.error('❌ Login Error:', err.response?.data || err.message);
-//     return {
-//       success: false,
-//       message: 'Error connecting to the server'
-//     };
-//   }
-// });
-
 
 // === เชื่อมต่อ RDP ===
 ipcMain.handle('connect-rdp', async () => {
