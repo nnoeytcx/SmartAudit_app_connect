@@ -20,45 +20,58 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, 'build', 'index.html'));
 }
-
-// === เชื่อมต่อ API สำหรับ login ===
-ipcMain.handle('login-request', async (event, { user_id, password }) => {
+// === ลอง ping server ===
+ipcMain.handle('ping-server', async (event, ip) => {
   try {
-    console.log('🔍 Login Request:', user_id, password); // Debug log
-
-    const response = await axios.post(
-      'http://192.168.121.195:3000/login',
-      {
-        user_id: parseInt(user_id),
-        password: password
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (response.data.success) {
-      return {
-        success: true,
-        message: 'Login successful',
-        user_info: response.data.user_info
-      };
+    const res = await axios.get(`http://${ip}:3000/ping`);
+    if (res.data.status === 'ok') {
+      return { success: true };
     } else {
-      return {
-        success: false,
-        message: response.data.message
-      };
+      return { success: false };
     }
   } catch (err) {
-    console.error('❌ Login Error:', err.response?.data || err.message);
-    return {
-      success: false,
-      message: 'Error connecting to the server'
-    };
+    return { success: false, message: err.message };
   }
 });
+
+// // === เชื่อมต่อ API สำหรับ login ===
+// ipcMain.handle('login-request', async (event, { user_id, password }) => {
+//   try {
+//     console.log('🔍 Login Request:', user_id, password); // Debug log
+
+//     const response = await axios.post(
+//       'http://192.168.121.195:3000/login',
+//       {
+//         user_id: parseInt(user_id),
+//         password: password
+//       },
+//       {
+//         headers: {
+//           'Content-Type': 'application/json'
+//         }
+//       }
+//     );
+
+//     if (response.data.success) {
+//       return {
+//         success: true,
+//         message: 'Login successful',
+//         user_info: response.data.user_info
+//       };
+//     } else {
+//       return {
+//         success: false,
+//         message: response.data.message
+//       };
+//     }
+//   } catch (err) {
+//     console.error('❌ Login Error:', err.response?.data || err.message);
+//     return {
+//       success: false,
+//       message: 'Error connecting to the server'
+//     };
+//   }
+// });
 
 
 // === เชื่อมต่อ RDP ===
@@ -91,6 +104,45 @@ ipcMain.handle('connect-rdp', async () => {
 
   } catch (err) {
     console.error('❌ connect-rdp Error:', err.message);
+  }
+});
+
+// === เชื่อมต่อ API login แบบกำหนด IP ===
+ipcMain.handle('login-request-with-ip', async (event, { user_id, password, server_ip }) => {
+  try {
+    console.log('🌐 Login to:', server_ip, 'User:', user_id);
+
+    const response = await axios.post(
+      `http://${server_ip}:3000/login`,
+      {
+        user_id: parseInt(user_id),
+        password
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (response.data.success) {
+      return {
+        success: true,
+        message: 'Login successful',
+        user_info: response.data.user_info
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message
+      };
+    }
+  } catch (err) {
+    console.error('❌ Login With IP Error:', err.message);
+    return {
+      success: false,
+      message: 'Cannot connect to server at ' + server_ip
+    };
   }
 });
 

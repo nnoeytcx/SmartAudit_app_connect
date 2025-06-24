@@ -8,41 +8,52 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const serverIP = localStorage.getItem('serverIP');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // ตัดช่องว่างก่อนส่งข้อมูลไป API
+
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
-    
+
     if (!trimmedUsername || !trimmedPassword) {
       setError("Please enter both username and password.");
       return;
     }
 
+    const serverIP = localStorage.getItem('serverIP');
+
+    if (!serverIP) {
+      setError("Server IP not found. Please configure it first.");
+      return;
+    }
+
     try {
-      // เรียกใช้ Electron IPC เพื่อทำการตรวจสอบ login
-      const result = await window.electronAPI.loginRequest(trimmedUsername, trimmedPassword);
-      
+      const result = await window.electronAPI.loginRequestWithIP({
+        user_id: trimmedUsername,
+        password: trimmedPassword,
+        server_ip: serverIP
+      });
+
       if (result.success) {
-        // ถ้าล็อกอินสำเร็จ, เก็บข้อมูล username, password ลง localStorage
+        // เก็บข้อมูลหลัง login
         localStorage.setItem('username', trimmedUsername);
         localStorage.setItem('password', trimmedPassword);
 
-        // เปลี่ยนไปหน้า Profile
+        // 👉 ถ้ามี user_info อื่น ๆ เก็บเพิ่มได้ที่นี่
+        // localStorage.setItem('role', result.user_info.role);
+
         navigate("/profile");
       } else {
-        setError(result.message); // แสดงข้อความ error ถ้าล็อกอินไม่สำเร็จ
-
-        // รีเซ็ตข้อมูลในฟอร์ม
+        setError(result.message || "Login failed");
         setUsername('');
         setPassword('');
       }
-    } catch (error) {
-      setError('Error connecting to the server');
 
-      // รีเซ็ตข้อมูลในฟอร์มเมื่อเกิดข้อผิดพลาด
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Cannot connect to server");
       setUsername('');
       setPassword('');
     }
@@ -58,10 +69,19 @@ const LoginPage = () => {
           <h1>Login</h1>
           <p>Smart Audit</p>
         </div>
+
+        {serverIP && (
+        <div className="ip-wrapper">
+        <span>IP: {serverIP}</span>
+        <span className="change-ip" onClick={() => navigate('/custom-ip')}>
+          Change IP
+        </span>
+        </div>
+      )}
+
         <form onSubmit={handleSubmit} className="text-input">
           <input
             type="text"
-            name="username"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -69,7 +89,6 @@ const LoginPage = () => {
           />
           <input
             type="password"
-            name="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -77,7 +96,7 @@ const LoginPage = () => {
           />
           <button type="submit">Login</button>
         </form>
-        {error && <p style={{ color: 'red' }}>{error}</p>} {/* แสดงข้อความ error */}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
     </div>
   );
