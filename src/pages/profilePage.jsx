@@ -1,11 +1,13 @@
 import React from 'react';
 import pic from '../component/asset/p.webp';
 import '../component/css/profile.css';
+import { useNavigate } from 'react-router-dom';
 
 function ProfilePage() {
-    const handleEnterServer = () => {
-        const selectedIP = "192.168.121.195"; // IP ของเซิร์ฟเวอร์ที่กำหนดไว้ตายตัว
+    const navigate = useNavigate(); // ✅ ใช้ตรงนี้เท่านั้น
 
+    const handleEnterServer = () => {
+        const selectedIP = "192.168.121.195";
         const username = localStorage.getItem("username");
         const password = localStorage.getItem("password");
 
@@ -15,6 +17,13 @@ function ProfilePage() {
         }
 
         window.electronAPI.connectRDP(username, password, selectedIP);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
+        localStorage.removeItem('serverIP');
+        navigate('/login'); 
     };
 
     return (
@@ -32,8 +41,11 @@ function ProfilePage() {
                     </button>
                 </div>
 
-                {/* <button>Change Password</button>
-                <button>History</button> */}
+                <div className="profile-container">
+                    <button className="logout-button" onClick={handleLogout}>
+                        LOGOUT
+                    </button>
+                </div>
             </div>
         </div>
     );
