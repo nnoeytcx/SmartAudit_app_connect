@@ -10,22 +10,29 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const serverIP = localStorage.getItem('serverIP');
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
 
-    if (!trimmedUsername || !trimmedPassword) {
-      setError("Please enter both username and password.");
+    if (!trimmedUsername) {
+      setError("Please enter UserID");
       return;
     }
 
-    const serverIP = localStorage.getItem('serverIP');
+    if (!/^\d+$/.test(trimmedUsername)) {
+      setError("Please enter your UserID as numbers only.");
+      return;
+    }
+
+    if (!trimmedPassword) {
+      setError("Please enter Password");
+      return;
+    }
 
     if (!serverIP) {
-      setError("Server IP not found. Please configure it first.");
+      setError("Server IP not found. Please set it first.");
       return;
     }
 
@@ -37,13 +44,8 @@ const LoginPage = () => {
       });
 
       if (result.success) {
-        // เก็บข้อมูลหลัง login
         localStorage.setItem('username', trimmedUsername);
         localStorage.setItem('password', trimmedPassword);
-
-        // 👉 ถ้ามี user_info อื่น ๆ เก็บเพิ่มได้ที่นี่
-        // localStorage.setItem('role', result.user_info.role);
-
         navigate("/profile");
       } else {
         setError(result.message || "Login failed");
@@ -53,7 +55,7 @@ const LoginPage = () => {
 
     } catch (err) {
       console.error("Login error:", err);
-      setError("Cannot connect to server");
+      setError("Unable to connect to server.");
       setUsername('');
       setPassword('');
     }
@@ -71,18 +73,18 @@ const LoginPage = () => {
         </div>
 
         {serverIP && (
-        <div className="ip-wrapper">
-        <span>IP: {serverIP}</span>
-        <span className="change-ip" onClick={() => navigate('/custom-ip')}>
-          Change IP
-        </span>
-        </div>
-      )}
+          <div className="ip-wrapper">
+            <span>IP: {serverIP}</span>
+            <span className="change-ip" onClick={() => navigate('/custom-ip')}>
+              Change IP
+            </span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="text-input">
           <input
             type="text"
-            placeholder="Username"
+            placeholder="UserID"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
