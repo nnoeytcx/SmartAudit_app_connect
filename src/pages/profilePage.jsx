@@ -22,7 +22,6 @@ function ProfilePage() {
     const handleLogout = () => {
         localStorage.removeItem('username');
         localStorage.removeItem('password');
-        localStorage.removeItem('serverIP');
         navigate('/login'); 
     };
 
