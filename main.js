@@ -1,10 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { exec } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
 // === CONFIG ===
 const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
+// const USERNAME = 'Administrator';
 
 // === Create Window ===
 function createWindow() {
@@ -48,15 +50,31 @@ ipcMain.handle('connect-rdp', async () => {
         else console.log('✅ Windows RDP launched.');
       });
 
-    } else if (platform === 'darwin') {
-      // สำหรับ macOS
-      const rdpUrl = `rdp://${GATEWAY_IP}`;
-      const openCommand = `open "${rdpUrl}"`;
-      console.log('🚀 Opening RDP to Gateway on macOS...');
-      exec(openCommand, (err) => {
-        if (err) console.error('❌ macOS RDP error:', err.message);
-        else console.log('✅ macOS RDP launched.');
+    }  else if (platform === 'darwin') {
+      const rdpContent = `
+          full address:s:${GATEWAY_IP}
+          prompt for credentials:i:1
+          screen mode id:i:2
+          desktopwidth:i:1280
+          desktopheight:i:720
+          session bpp:i:32
+          `.trim();
+
+      const filePath = path.join(require('os').tmpdir(), 'temp_connection.rdp');
+      fs.writeFileSync(filePath, rdpContent);
+
+      exec(`open "${filePath}"`, (err) => {
+        if (err) console.error('❌ Failed to open .rdp file:', err.message);
+        else console.log('✅ RDP launched via .rdp file.');
       });
+        // สำหรับ macOS
+      //  const rdpUrl = `rdp://${GATEWAY_IP}`;
+      //  const openCommand = `open "${rdpUrl}"`;
+      //  console.log('🚀 Opening RDP to Gateway on macOS...');
+      //  exec(openCommand, (err) => {
+      //    if (err) console.error('❌ macOS RDP error:', err.message);
+      //    else console.log('✅ macOS RDP launched.');
+      //  });
 
     } else {
       console.error(`❌ Unsupported platform: ${platform}`);
