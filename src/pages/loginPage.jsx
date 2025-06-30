@@ -8,7 +8,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const serverIP = localStorage.getItem('serverIP');
+  const [authType, setAuthType] = useState('server'); // server หรือ ad
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,16 +31,22 @@ const LoginPage = () => {
       return;
     }
 
-    if (!serverIP) {
-      setError("Server IP not found. Please set it first.");
-      return;
+    let selectedIP = '';
+    if (authType === 'server') {
+      selectedIP = localStorage.getItem('serverIP');
+      if (!selectedIP) {
+        setError("Server IP not found. Please set it first.");
+        return;
+      }
+    } else if (authType === 'ad') {
+      selectedIP = '192.168.121.123'; // ใส่ IP ของ AD ที่นี่
     }
 
     try {
       const result = await window.electronAPI.loginRequestWithIP({
         user_id: trimmedUsername,
         password: trimmedPassword,
-        server_ip: serverIP
+        server_ip: selectedIP
       });
 
       if (result.success) {
@@ -72,9 +78,9 @@ const LoginPage = () => {
           <p>Smart Audit</p>
         </div>
 
-        {serverIP && (
+        {localStorage.getItem('serverIP') && (
           <div className="ip-wrapper">
-            <span>IP: {serverIP}</span>
+            <span>IP: {localStorage.getItem('serverIP')}</span>
             <span className="change-ip" onClick={() => navigate('/custom-ip')}>
               Change IP
             </span>
@@ -96,6 +102,29 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <div className="radio-group">
+            <label>
+              <input
+                type="radio"
+                name="authType"
+                value="server"
+                checked={authType === 'server'}
+                onChange={(e) => setAuthType(e.target.value)}
+              />
+              <span>Server</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="authType"
+                value="ad"
+                checked={authType === 'ad'}
+                onChange={(e) => setAuthType(e.target.value)}
+              />
+              <span>AD</span>
+            </label>
+          </div>
+
           <button type="submit">Login</button>
         </form>
         {error && <p style={{ color: 'red' }}>{error}</p>}

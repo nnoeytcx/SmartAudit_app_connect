@@ -11,8 +11,8 @@ const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
 // === Create Window ===
 function createWindow() {
   const win = new BrowserWindow({
-    width: 450,
-    height: 570,
+    width: 470,
+    height: 620,
     title: 'Smart Audit',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
