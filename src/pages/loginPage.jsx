@@ -2,32 +2,41 @@ import React, { useState } from 'react';
 import '../component/css/login.css';
 import securityLogo from '../component/asset/Security Shield.png';
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from 'lucide-react'; // ติดตั้งด้วย npm install lucide-react
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // ✅ เพิ่ม state
+  const [domain, setDomain] = useState('');
   const [error, setError] = useState('');
-  const [authType, setAuthType] = useState('server'); // server หรือ ad
+  const [authType, setAuthType] = useState('server');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
+    const trimmedDomain = domain.trim();
 
     if (!trimmedUsername) {
       setError("Please enter UserID");
       return;
     }
 
-    if (!/^\d+$/.test(trimmedUsername)) {
+    if (authType === 'server' && !/^\d+$/.test(trimmedUsername)) {
       setError("Please enter your UserID as numbers only.");
       return;
     }
 
     if (!trimmedPassword) {
       setError("Please enter Password");
+      return;
+    }
+
+    if (authType === 'ad' && !trimmedDomain) {
+      setError("Please enter Domain");
       return;
     }
 
@@ -46,17 +55,23 @@ const LoginPage = () => {
       const result = await window.electronAPI.loginRequestWithIP({
         user_id: trimmedUsername,
         password: trimmedPassword,
-        server_ip: selectedIP
+        server_ip: selectedIP,
+        domain: authType === 'ad' ? trimmedDomain : null,
+        auth_type: authType
       });
 
       if (result.success) {
         localStorage.setItem('username', trimmedUsername);
         localStorage.setItem('password', trimmedPassword);
+        if (authType === 'ad') {
+          localStorage.setItem('domain', trimmedDomain);
+        }
         navigate("/profile");
       } else {
         setError(result.message || "Login failed");
         setUsername('');
         setPassword('');
+        setDomain('');
       }
 
     } catch (err) {
@@ -64,6 +79,7 @@ const LoginPage = () => {
       setError("Unable to connect to server.");
       setUsername('');
       setPassword('');
+      setDomain('');
     }
   };
 
@@ -88,6 +104,14 @@ const LoginPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="text-input">
+          {authType === 'ad' && (
+            <input
+              type="text"
+              placeholder="Domain"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+            />
+          )}
           <input
             type="text"
             placeholder="UserID"
@@ -95,13 +119,23 @@ const LoginPage = () => {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+
+          <div className="password-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+
           <div className="radio-group">
             <label>
               <input

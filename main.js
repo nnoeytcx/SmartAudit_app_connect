@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { getDBConnection } = require('./db'); 
 
 // === CONFIG ===
 const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
@@ -11,8 +12,8 @@ const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
 // === Create Window ===
 function createWindow() {
   const win = new BrowserWindow({
-    width: 470,
-    height: 620,
+    width: 500,
+    height: 650,
     title: 'Smart Audit',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -33,6 +34,19 @@ ipcMain.handle('ping-server', async (event, ip) => {
     }
   } catch (err) {
     return { success: false, message: err.message };
+  }
+});
+
+ipcMain.handle('get-session-ip-list', async () => {
+  try {
+    const connection = await getDBConnection(); 
+    const [rows] = await connection.execute('SELECT DISTINCT ip FROM devices'); 
+    const result = rows.map(row => ({ ip: row.ip })); 
+    console.log("🔥 Device IPs:", result);
+    return result;
+  } catch (err) {
+    console.error('❌ DB fetch IP error:', err);
+    return [];
   }
 });
 

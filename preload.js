@@ -5,19 +5,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   connectRDP: (username, password, ip) =>
     ipcRenderer.invoke('connect-rdp', { username, password, ip }),
 
-  // ดึงรายการ IP จากฐานข้อมูล
+  // ดึงรายการ IP จากฐานข้อมูล (device)
   getDevices: () =>
     ipcRenderer.invoke('get-devices'),
 
-  // เชื่อมต่อสำหรับ Login แบบ default (IP คงที่)
-  // loginRequest: (user_id, password) =>
-  //   ipcRenderer.invoke('login-request', { user_id, password }),
-
-  // เชื่อมต่อ Login แบบกำหนด IP
+  // Login แบบกำหนด IP
   loginRequestWithIP: ({ user_id, password, server_ip }) =>
     ipcRenderer.invoke('login-request-with-ip', { user_id, password, server_ip }),
 
   // ใช้สำหรับเช็คว่าติดต่อ server ได้มั้ย
   pingServer: (ip) =>
-    ipcRenderer.invoke('ping-server', ip)
+    ipcRenderer.invoke('ping-server', ip),
+
+  // ✅ เพิ่มตรงนี้: ดึง session IP จากฐานข้อมูล
+  getSessionIPList: () =>
+    ipcRenderer.invoke('get-session-ip-list')
 });
