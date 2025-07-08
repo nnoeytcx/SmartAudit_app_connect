@@ -15,10 +15,10 @@ function ProfilePage() {
         const fetchIPs = async () => {
             try {
             const list = await window.electronAPI.getSessionIPList();
-            console.log("🎯 Fetched IP List:", list);  // ✅ DEBUG
+            console.log("Fetched IP List:", list);  // ✅ DEBUG
             setIpList(list);
             } catch (err) {
-            console.error("❌ Failed to fetch IPs:", err);
+            console.error("Failed to fetch IPs:", err);
             }
         };
 

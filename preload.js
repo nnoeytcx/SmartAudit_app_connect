@@ -17,7 +17,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   pingServer: (ip) =>
     ipcRenderer.invoke('ping-server', ip),
 
-  // ✅ เพิ่มตรงนี้: ดึง session IP จากฐานข้อมูล
+  // ✅ ดึง session IP จากฐานข้อมูล
   getSessionIPList: () =>
-    ipcRenderer.invoke('get-session-ip-list')
+    ipcRenderer.invoke('get-session-ip-list'),
+
+  // ✅ ใหม่: เช็คว่าเครื่องมีโปรแกรม Remote Desktop หรือไม่
+  checkRdpInstalled: () =>
+    ipcRenderer.invoke('check-rdp-installed')
 });

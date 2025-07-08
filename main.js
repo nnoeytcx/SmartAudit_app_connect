@@ -42,10 +42,10 @@ ipcMain.handle('get-session-ip-list', async () => {
     const connection = await getDBConnection(); 
     const [rows] = await connection.execute('SELECT DISTINCT ip FROM devices'); 
     const result = rows.map(row => ({ ip: row.ip })); 
-    console.log("🔥 Device IPs:", result);
+    console.log("Device IPs:", result);
     return result;
   } catch (err) {
-    console.error('❌ DB fetch IP error:', err);
+    console.error('DB fetch IP error:', err);
     return [];
   }
 });
@@ -60,11 +60,13 @@ ipcMain.handle('connect-rdp', async () => {
       const rdpCommand = `mstsc /v:${GATEWAY_IP}`;
       console.log('🚀 Opening RDP to Gateway on Windows...');
       exec(rdpCommand, (err) => {
-        if (err) console.error('❌ Windows RDP error:', err.message);
-        else console.log('✅ Windows RDP launched.');
+        if (err) console.error('Windows RDP error:', err.message);
+        else console.log('Windows RDP launched.');
       });
 
-    }  else if (platform === 'darwin') {
+    }
+    // สำหรับ macOS
+    else if (platform === 'darwin') {
       const rdpContent = `
           full address:s:${GATEWAY_IP}
           prompt for credentials:i:1
@@ -79,23 +81,14 @@ ipcMain.handle('connect-rdp', async () => {
 
       exec(`open "${filePath}"`, (err) => {
         if (err) console.error('❌ Failed to open .rdp file:', err.message);
-        else console.log('✅ RDP launched via .rdp file.');
+        else console.log('RDP launched via .rdp file.');
       });
-        // สำหรับ macOS
-      //  const rdpUrl = `rdp://${GATEWAY_IP}`;
-      //  const openCommand = `open "${rdpUrl}"`;
-      //  console.log('🚀 Opening RDP to Gateway on macOS...');
-      //  exec(openCommand, (err) => {
-      //    if (err) console.error('❌ macOS RDP error:', err.message);
-      //    else console.log('✅ macOS RDP launched.');
-      //  });
-
     } else {
-      console.error(`❌ Unsupported platform: ${platform}`);
+      console.error(`Unsupported platform: ${platform}`);
     }
 
   } catch (err) {
-    console.error('❌ connect-rdp Error:', err.message);
+    console.error('Connect-rdp Error:', err.message);
   }
 });
 
@@ -130,11 +123,35 @@ ipcMain.handle('login-request-with-ip', async (event, { user_id, password, serve
       };
     }
   } catch (err) {
-    console.error('❌ Login With IP Error:', err.message);
+    console.error('Login With IP Error:', err.message);
     return {
       success: false,
       message: 'Cannot connect to server at ' + server_ip
     };
+  }
+});
+
+// เช็ค remote desktop (mstsc) ว่ามีหรือไม่
+ipcMain.handle('check-rdp-installed', async () => {
+  try {
+    if (process.platform === 'win32') {
+      const system32Path = path.join(process.env.WINDIR, 'System32', 'mstsc.exe');
+      const exists = fs.existsSync(system32Path);
+      console.log("RDP Installed ? :", exists);
+      return exists;
+    }
+
+    if (process.platform === 'darwin') {
+      const macRdpPath = '/Applications/Microsoft Remote Desktop.app';
+      const exists = fs.existsSync(macRdpPath);
+      console.log("RDP Installed ? :", exists);
+      return exists;
+    }
+
+    return false;
+  } catch (err) {
+    console.error('check-rdp-installed error:', err.message);
+    return false;
   }
 });
 

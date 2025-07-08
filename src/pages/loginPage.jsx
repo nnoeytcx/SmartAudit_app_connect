@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import '../component/css/login.css';
 import securityLogo from '../component/asset/Security Shield.png';
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from 'lucide-react'; // ติดตั้งด้วย npm install lucide-react
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // ✅ เพิ่ม state
+  const [showPassword, setShowPassword] = useState(false);
   const [domain, setDomain] = useState('');
   const [error, setError] = useState('');
   const [authType, setAuthType] = useState('server');
@@ -48,7 +48,7 @@ const LoginPage = () => {
         return;
       }
     } else if (authType === 'ad') {
-      selectedIP = '192.168.121.123'; // ใส่ IP ของ AD ที่นี่
+      selectedIP = '192.168.121.123';
     }
 
     try {
@@ -61,12 +61,23 @@ const LoginPage = () => {
       });
 
       if (result.success) {
+        // บันทึกข้อมูลก่อน
         localStorage.setItem('username', trimmedUsername);
         localStorage.setItem('password', trimmedPassword);
         if (authType === 'ad') {
           localStorage.setItem('domain', trimmedDomain);
         }
+
+        // ✅ ตรวจสอบว่าเครื่องมี mstsc หรือไม่
+        const rdpExists = await window.electronAPI.checkRdpInstalled();
+        console.log("🧐 RDP exists?", rdpExists);
+        if (!rdpExists) {
+          alert("Remote Desktop (mstsc.exe) not found. Please install it before continuing.");
+          return;
+        }
+
         navigate("/profile");
+
       } else {
         setError(result.message || "Login failed");
         setUsername('');
