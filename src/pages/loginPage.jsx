@@ -62,8 +62,12 @@ const LoginPage = () => {
 
       if (result.success) {
         // บันทึกข้อมูลก่อน
+        const userInfo = result.user_info;
+        
         localStorage.setItem('username', trimmedUsername);
         localStorage.setItem('password', trimmedPassword);
+        localStorage.setItem('firstname', userInfo.firstname);
+
         if (authType === 'ad') {
           localStorage.setItem('domain', trimmedDomain);
         }

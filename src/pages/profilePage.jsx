@@ -10,6 +10,7 @@ function ProfilePage() {
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const serverIP = localStorage.getItem("serverIP");
+    const firstname = localStorage.getItem('firstname') || 'User';
 
     useEffect(() => {
         const fetchIPs = async () => {
@@ -54,7 +55,7 @@ function ProfilePage() {
                 <div className="profile">
                     <img src={pic} alt="Profile" />
                 </div>
-                <p className="name">Somwang</p>
+                <p className="name">{firstname}</p>
                 <p className="position">Security Operation</p>
 
                 <div className="dropdown-container">

@@ -98,7 +98,7 @@ ipcMain.handle('login-request-with-ip', async (event, { user_id, password, serve
     console.log('🌐 Login to:', server_ip, 'User:', user_id);
 
     const response = await axios.post(
-      `http://${server_ip}:3000/login`,
+      `http://${server_ip}:3000/api/login`,
       {
         user_id: parseInt(user_id),
         password
