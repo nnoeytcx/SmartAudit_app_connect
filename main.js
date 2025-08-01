@@ -23,7 +23,7 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, 'build', 'index.html'));
 }
-// === ลอง ping server ===
+
 ipcMain.handle('ping-server', async (event, ip) => {
   try {
     const res = await axios.get(`http://${ip}:3000/ping`);
@@ -92,7 +92,6 @@ ipcMain.handle('connect-rdp', async () => {
   }
 });
 
-// === เชื่อมต่อ API login แบบกำหนด IP ===
 ipcMain.handle('login-request-with-ip', async (event, { user_id, password, server_ip }) => {
   try {
     console.log('🌐 Login to:', server_ip, 'User:', user_id);
@@ -131,7 +130,6 @@ ipcMain.handle('login-request-with-ip', async (event, { user_id, password, serve
   }
 });
 
-// เช็ค remote desktop (mstsc) ว่ามีหรือไม่
 ipcMain.handle('check-rdp-installed', async () => {
   try {
     if (process.platform === 'win32') {
