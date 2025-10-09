@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const { getDBConnection } = require('./db'); 
+const os = require('os');
 
 // === CONFIG ===
 const GATEWAY_IP = '192.168.121.195';  // IP ของ Gateway
@@ -48,6 +49,25 @@ ipcMain.handle('get-session-ip-list', async () => {
     console.error('DB fetch IP error:', err);
     return [];
   }
+});
+
+ipcMain.handle('get-hostname', async () => {
+  const host = os.hostname();
+  console.log('[Electron] Hostname:', host);
+  return host;
+});
+
+ipcMain.handle('get-host-info', async () => {
+  const nets = os.networkInterfaces();
+  const ips = Object.values(nets)
+    .flat()
+    .filter(Boolean)
+    .filter(n => n.family === 'IPv4' && !n.internal)
+    .map(n => n.address);
+
+  const info = { hostname: os.hostname(), ips };
+  console.log('[Electron] Host info:', info);
+  return info;
 });
 
 // === เชื่อมต่อ RDP ===

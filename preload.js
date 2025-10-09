@@ -23,5 +23,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // ✅ ใหม่: เช็คว่าเครื่องมีโปรแกรม Remote Desktop หรือไม่
   checkRdpInstalled: () =>
-    ipcRenderer.invoke('check-rdp-installed')
+    ipcRenderer.invoke('check-rdp-installed'),
+
+  getHostname: () => 
+    ipcRenderer.invoke('get-hostname'),
+
+  getHostInfo: () => 
+    ipcRenderer.invoke('get-host-info')
 });
